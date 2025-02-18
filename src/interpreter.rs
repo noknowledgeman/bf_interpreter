@@ -1,5 +1,5 @@
 use crate::lexer::{Tokens, Token};
-use std::io::{self, ErrorKind, Read};
+use std::io::{self};
 
 const NUM_CELLS: usize = 30_000;
 
@@ -26,8 +26,20 @@ impl<'a> Interpreter<'a> {
         match tok {
             Token::Plus => self.arr[self.pointer] = self.arr[self.pointer].wrapping_add(1),
             Token::Minus => self.arr[self.pointer] = self.arr[self.pointer].wrapping_sub(1),
-            Token::Right => self.pointer = (self.pointer.wrapping_add(1))%NUM_CELLS,
-            Token::Left => self.pointer = (self.pointer.wrapping_sub(1))%NUM_CELLS,
+            Token::Right => self.pointer = {
+                if self.pointer == NUM_CELLS - 1 {
+                    0
+                } else {
+                    self.pointer + 1
+                }
+            },
+            Token::Left => self.pointer = {
+                if self.pointer == 0 {
+                    NUM_CELLS - 1 
+                } else {
+                    self.pointer - 1
+                }
+            },
             Token::Out => {
                 let _ = self.output.write(&[self.arr[self.pointer]]);
                 let _ = self.output.flush().expect("Something went wrong while printing");
@@ -49,6 +61,7 @@ impl<'a> Interpreter<'a> {
                 }
             }
             Token::EOF => (),
+            Token::Debug => self.debug(),
         }
     }
 
@@ -56,5 +69,11 @@ impl<'a> Interpreter<'a> {
         while let Some(tok) = self.tokens.next() {
             self.step(tok);
         }
+    }
+
+    fn debug(&self) {
+        dbg!(&self.tokens);
+        dbg!(&self.pointer);
+        dbg!(&self.arr[0..20]);
     }
 }

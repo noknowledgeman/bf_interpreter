@@ -28,6 +28,7 @@ impl<'a> Lexer<'a> {
                 ']' => Token::RLoop,
                 '.' => Token::Out,
                 ',' => Token::In,
+                '~' => Token::Debug,
                 _ => continue,
             };
             tokens.push(tok);
@@ -48,12 +49,13 @@ pub enum Token {
     Out,
     In,
     EOF,
+    Debug,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Tokens {
     tokens: Vec<Token>,
-    pub index: usize,
+    index: usize,
     jump_table: HashMap<usize, usize>
 }
 

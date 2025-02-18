@@ -1,5 +1,4 @@
-use std::{env, io::{stdout, Write}, process::ExitCode};
-use bf_interpreter::{interpreter::Interpreter, lexer::Lexer};
+use std::{env, io::stdout, process::ExitCode};
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
@@ -9,15 +8,10 @@ fn main() -> ExitCode {
     }
 
     let input = std::fs::read_to_string(&args[1]).expect("Wrong path");
-    let mut lexer = Lexer::new(&input);
-    let mut tokens = lexer.tokenize();
-    dbg!(&tokens);
 
     let mut output = stdout();
 
-    let mut int = Interpreter::new(&mut tokens, &mut output);
-    int.run();
-    let _ = output.flush();
+    bf_interpreter::run(&input, &mut output);
 
     ExitCode::SUCCESS
 }
